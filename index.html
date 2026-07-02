@@ -51,7 +51,6 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
 
-  /* All inputs 16px to prevent iOS auto-zoom */
   input, select, textarea { font-size: 16px !important; }
 
   .tab-active { color: var(--primary) !important; }
@@ -103,18 +102,10 @@
   .item-option:active { background: var(--bg-soft); }
 
   .mini-toast {
-    position: fixed;
-    top: calc(var(--safe-top) + 6px);
-    left: 50%; transform: translateX(-50%);
-    z-index: 200;
-    display: flex; align-items: center; gap: 6px;
-    padding: 7px 14px;
-    border-radius: 100px;
-    font-size: 12px; font-weight: 700;
-    color: white;
-    box-shadow: 0 4px 16px rgba(0,0,0,.15);
-    white-space: nowrap;
-    pointer-events: none;
+    position: fixed; top: calc(var(--safe-top) + 6px); left: 50%; transform: translateX(-50%);
+    z-index: 200; display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 100px; font-size: 12px; font-weight: 700;
+    color: white; box-shadow: 0 4px 16px rgba(0,0,0,.15); white-space: nowrap; pointer-events: none;
   }
 
   .modal-open { position: fixed; width: 100%; overflow: hidden; }
@@ -128,7 +119,6 @@
 <body class="relative">
 <div class="grain"></div>
 
-<!-- Mini toast container -->
 <div id="toastContainer"></div>
 
 <!-- Header -->
@@ -140,13 +130,13 @@
       </div>
       <div>
         <h1 class="display text-xl font-bold leading-none">CarzSpa</h1>
-        <p class="text-[10px] text-[var(--muted)] uppercase tracking-[0.15em] font-semibold mt-0.5">Stock Manager</p>
-        <p class="text-[9px] text-[var(--accent)] font-bold mt-0.5 tracking-wider">MADE BY ANAS</p>
+        <p class="text-[10px] text-[var(--muted)] uppercase tracking-[0.15em] font-semibold mt-0.5">Made By Anas</p>
       </div>
     </div>
     <div class="flex items-center gap-2">
-      <button onclick="openSettingsModal()" class="w-10 h-10 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center active:scale-95 transition">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <button onclick="openSettingsModal()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)] text-[var(--fg)] text-xs font-bold active:scale-95 transition">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Manage</span>
       </button>
       <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-bold active:scale-95 transition shadow-md shadow-[var(--primary)]/20">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -168,7 +158,7 @@
         <div class="flex items-end justify-between mt-1">
           <div>
             <p class="display text-5xl font-black leading-none" id="heroStock">0</p>
-            <p class="text-xs text-white/80 mt-1.5 font-medium">Total units in stock</p>
+            <p class="text-xs text-white/80 mt-1.5 font-medium">Total unique items</p>
           </div>
           <div class="text-right">
             <p class="text-[10px] uppercase tracking-wider text-white/60 font-bold">Today</p>
@@ -228,26 +218,29 @@
 
 <!-- Modal -->
 <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onclick="closeModalBg(event)">
-  <div id="modalContent" class="modal-sheet absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-[var(--bg)] rounded-t-3xl modal-enter overflow-y-auto shadow-2xl" style="max-height: 88vh; padding-bottom: var(--safe-bottom); -webkit-overflow-scrolling: touch;"></div>
+  <div id="modalContent" class="modal-sheet absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-[var(--bg)] rounded-t-3xl modal-enter overflow-y-auto shadow-2xl" style="max-height: 88vh; padding-bottom: var(--safe-bottom);"></div>
 </div>
 
 <script>
 /* ============================================================
-   CARZSPA STOCK MANAGER — Single File
+   CARZSPA STOCK MANAGER — v2 (Empty Data, Custom Units & Conv)
    ============================================================ */
 
-/* ===== DEFAULTS ===== */
-const DEFAULT_CATEGORIES = [
-  'Abrasives', 'Polishing Pads', 'Brushes', 'Microfibre & Towels',
-  'Applicators', 'Compounds & Polishes', 'Cleaners', 'Dressing',
-  'Ceramic Coating', 'PPF', 'Wash Accessories'
-];
-const DEFAULT_UNITS = [
-  'Piece', 'Pack', 'Set', 'Pair', 'Bottle', 'Can', 'Drum', 'Roll', 'Litre', 'ml', 'Box', 'Kit'
-];
-
 /* ===== DATA LAYER ===== */
-let DB = { items: [], transactions: [], categories: [...DEFAULT_CATEGORIES], units: [...DEFAULT_UNITS] };
+let DB = {
+  items: [],
+  transactions: [],
+  categories: [
+    'Abrasives', 'Polishing Pads', 'Brushes', 'Microfibre & Towels',
+    'Applicators', 'Compounds & Polishes', 'Cleaners', 'Dressing',
+    'Ceramic Coating', 'PPF', 'Wash Accessories'
+  ],
+  units: ['Piece', 'Pack', 'Set', 'Pair', 'Bottle', 'Can', 'Drum', 'Roll', 'Box', 'Litre', 'ml', 'Kg', 'g'],
+  conversions: [
+    { from: 'Litre', to: 'ml', factor: 1000 },
+    { from: 'Kg', to: 'g', factor: 1000 }
+  ]
+};
 let currentTab = 'summary';
 let txnItemSelected = null;
 let summaryFilter = 'ALL';
@@ -255,9 +248,7 @@ let summaryCategory = 'ALL';
 let txnFilter = 'ALL';
 let masterCategory = 'ALL';
 
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 function todayStr() {
   const d = new Date();
   const off = d.getTimezoneOffset();
@@ -272,37 +263,51 @@ function loadDB() {
       const parsed = JSON.parse(saved);
       if (parsed && Array.isArray(parsed.items)) {
         DB = parsed;
-        if (!DB.categories) DB.categories = [...DEFAULT_CATEGORIES];
-        if (!DB.units) DB.units = [...DEFAULT_UNITS];
-        if (!DB.transactions) DB.transactions = [];
+        // Ensure all arrays exist
+        DB.items = DB.items || [];
+        DB.transactions = DB.transactions || [];
+        DB.categories = DB.categories || [];
+        DB.units = DB.units || [];
+        DB.conversions = DB.conversions || [];
         return;
       }
     }
   } catch(e) { console.warn('Load error:', e); }
-  // Initialize empty
-  DB = {
-    items: [],
-    transactions: [],
-    categories: [...DEFAULT_CATEGORIES],
-    units: [...DEFAULT_UNITS]
-  };
   saveDB();
 }
 
 function saveDB() {
-  try {
-    localStorage.setItem('carzspa_stock_v2', JSON.stringify(DB));
-  } catch(e) {
-    console.error('Save error:', e);
-    toast('Storage full', 'error');
-  }
+  try { localStorage.setItem('carzspa_stock_v2', JSON.stringify(DB)); } 
+  catch(e) { toast('Storage full', 'error'); }
+}
+
+/* ===== UNIT CONVERTER ===== */
+function getBaseQty(qty, fromUnit, toUnit) {
+  if (!fromUnit || !toUnit || fromUnit === toUnit) return qty;
+  
+  // Check direct rule: 1 fromUnit = factor toUnit
+  let rule = DB.conversions.find(c => c.from === fromUnit && c.to === toUnit);
+  if (rule) return qty * rule.factor;
+  
+  // Check reverse rule: 1 toUnit = factor fromUnit -> 1 fromUnit = 1/factor toUnit
+  rule = DB.conversions.find(c => c.from === toUnit && c.to === fromUnit);
+  if (rule) return qty / rule.factor;
+  
+  return qty; // Fallback 1:1 if no rule
 }
 
 function currentStock(itemId) {
   let s = 0;
-  for (const t of DB.transactions) {
-    if (t.itemId === itemId) s += (t.type === 'IN' ? t.qty : -t.qty);
-  }
+  const item = DB.items.find(i => i.id === itemId);
+  if (!item) return 0;
+  
+  DB.transactions.forEach(t => {
+    if (t.itemId === itemId) {
+      // Dynamically convert transaction qty to item's base unit
+      const baseQty = getBaseQty(t.qty, t.unit, item.unit);
+      s += (t.type === 'IN' ? baseQty : -baseQty);
+    }
+  });
   return s;
 }
 
@@ -382,14 +387,13 @@ function fabAction() {
 }
 
 function renderStats() {
-  let totalStock = 0, lowCount = 0, outCount = 0;
+  let lowCount = 0, outCount = 0;
   DB.items.forEach(it => {
     const s = currentStock(it.id);
-    totalStock += Math.max(0, s);
     if (s <= 0) outCount++;
     else if (s <= it.minStock) lowCount++;
   });
-  document.getElementById('heroStock').textContent = totalStock;
+  document.getElementById('heroStock').textContent = DB.items.length;
   document.getElementById('heroToday').textContent = DB.transactions.filter(t => t.date === todayStr()).length;
   document.getElementById('statItems').textContent = DB.items.length;
   document.getElementById('statLow').textContent = lowCount;
@@ -411,7 +415,7 @@ function renderSummary(container) {
     </div>
     <div class="chip-scroll flex gap-2 mb-3 overflow-x-auto pb-1">
       ${cats.map(c => `
-        <button onclick="setSummaryCategory('${c.replace(/'/g, "\\'")}')" class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition ${summaryCategory===c ? 'bg-[var(--accent)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
+        <button onclick="setSummaryCategory('${c}')" class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition ${summaryCategory===c ? 'bg-[var(--accent)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
       `).join('')}
     </div>
     <div class="relative mb-3">
@@ -450,7 +454,14 @@ function renderSummaryList() {
     const isOut = stock <= 0;
     const isLow = !isOut && stock <= it.minStock;
     let inT = 0, outT = 0;
-    DB.transactions.forEach(t => { if (t.itemId === it.id) { if (t.type==='IN') inT += t.qty; else outT += t.qty; } });
+    
+    DB.transactions.forEach(t => {
+      if (t.itemId === it.id) {
+        const baseQty = getBaseQty(t.qty, t.unit, it.unit);
+        if (t.type==='IN') inT += baseQty; else outT += baseQty;
+      }
+    });
+    
     const pct = Math.min(100, Math.max(4, (stock / Math.max(it.minStock * 2, 1)) * 100));
     const barClass = isOut ? 'out' : isLow ? 'low' : '';
     let badge = '';
@@ -469,9 +480,9 @@ function renderSummaryList() {
         </div>
         <div class="stock-bar ${barClass} mb-3"><span style="width:${pct}%"></span></div>
         <div class="grid grid-cols-4 gap-2 items-end">
-          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">In</p><p class="text-sm font-bold text-[var(--primary)]">+${inT}</p></div>
-          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Out</p><p class="text-sm font-bold text-[var(--danger)]">-${outT}</p></div>
-          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Balance</p><p class="display text-xl font-black ${isOut ? 'text-[var(--danger)]' : isLow ? 'text-[var(--accent)]' : 'text-[var(--fg)]'}">${stock}</p></div>
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">In</p><p class="text-sm font-bold text-[var(--primary)]">+${inT.toFixed(2)}</p></div>
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Out</p><p class="text-sm font-bold text-[var(--danger)]">-${outT.toFixed(2)}</p></div>
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Balance</p><p class="display text-xl font-black ${isOut ? 'text-[var(--danger)]' : isLow ? 'text-[var(--accent)]' : 'text-[var(--fg)]'}">${stock.toFixed(2)}</p></div>
           <div class="text-right"><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Unit / Min</p><p class="text-xs font-bold">${it.unit}</p><p class="text-[10px] text-[var(--muted)]">min ${it.minStock}</p></div>
         </div>
       </div>`;
@@ -515,14 +526,11 @@ function renderTxnList() {
     let label = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
     if (date === today) label = 'Today';
     else if (date === yest) label = 'Yesterday';
-    let dayIn = 0, dayOut = 0;
-    groups[date].forEach(t => t.type === 'IN' ? dayIn += t.qty : dayOut += t.qty);
 
     return `
       <div>
         <div class="flex items-center justify-between px-1 mb-2">
           <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">${label}</p>
-          <p class="text-[10px] text-[var(--muted)] font-semibold">+${dayIn} / -${dayOut}</p>
         </div>
         ${groups[date].map(t => {
           const item = DB.items.find(i => i.id === t.itemId);
@@ -532,6 +540,12 @@ function renderTxnList() {
           if (isIn && t.company) metaParts.push(t.company);
           if (t.remark) metaParts.push(t.remark);
           const meta = metaParts.join(' · ') || '—';
+          
+          let conversionTxt = '';
+          if (item && t.unit !== item.unit) {
+            conversionTxt = `<span class="block text-[9px] text-[var(--accent)] font-bold mt-0.5">Issued in ${t.unit} (Base: ${getBaseQty(t.qty, t.unit, item.unit).toFixed(2)} ${item.unit})</span>`;
+          }
+
           return `
             <div class="card-press bg-white rounded-2xl p-3 border border-[var(--border)] flex items-center gap-3 mb-2">
               <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${isIn ? 'bg-green-100' : 'bg-red-100'}">
@@ -542,11 +556,13 @@ function renderTxnList() {
               <div class="flex-1 min-w-0">
                 <p class="font-bold text-sm truncate">${item ? item.name : 'Unknown'}</p>
                 <p class="text-[11px] text-[var(--muted)] truncate">${meta}</p>
+                ${conversionTxt}
                 ${item ? `<span class="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--bg-soft)] text-[var(--muted)] mt-1">${item.code}</span>` : ''}
               </div>
               <div class="text-right flex-shrink-0">
-                <p class="font-bold text-base ${isIn ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}">${isIn ? '+' : '-'}${t.qty} <span class="text-[10px] font-medium text-[var(--muted)]">${t.txnUnit || (item ? item.unit : '')}</span></p>
-                <button onclick="confirmDeleteTxn('${t.id}')" class="text-[10px] text-[var(--muted)] mt-0.5 font-semibold">Delete</button>
+                <p class="font-bold text-base ${isIn ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}">${isIn ? '+' : '-'}${t.qty}</p>
+                <p class="text-[9px] text-[var(--muted)] -mt-1">${t.unit}</p>
+                <button onclick="confirmDeleteTxn('${t.id}')" class="text-[10px] text-[var(--muted)] mt-1 font-semibold">Delete</button>
               </div>
             </div>`;
         }).join('')}
@@ -567,7 +583,7 @@ function renderMasters(container) {
   container.innerHTML = `
     <div class="chip-scroll flex gap-2 mb-3 overflow-x-auto pb-1">
       ${cats.map(c => `
-        <button onclick="setMasterCategory('${c.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${masterCategory===c ? 'bg-[var(--primary)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
+        <button onclick="setMasterCategory('${c}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${masterCategory===c ? 'bg-[var(--primary)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
       `).join('')}
     </div>
     <div class="relative mb-3">
@@ -614,7 +630,7 @@ function renderMasterList() {
         <div class="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border)]">
           <div>
             <p class="text-[10px] text-[var(--muted)] uppercase font-bold">Current Stock</p>
-            <p class="display text-2xl font-black ${stock <= 0 ? 'text-[var(--danger)]' : stock <= it.minStock ? 'text-[var(--accent)]' : 'text-[var(--primary)]'}">${stock} <span class="text-xs font-medium text-[var(--muted)]">${it.unit}</span></p>
+            <p class="display text-2xl font-black ${stock <= 0 ? 'text-[var(--danger)]' : stock <= it.minStock ? 'text-[var(--accent)]' : 'text-[var(--primary)]'}">${stock.toFixed(2)} <span class="text-xs font-medium text-[var(--muted)]">${it.unit}</span></p>
           </div>
           <div class="flex gap-2">
             <button onclick="openItemModal('${it.id}')" class="px-3.5 py-2 rounded-lg bg-[var(--bg-soft)] border border-[var(--border)] text-xs font-bold active:scale-95">Edit</button>
@@ -639,117 +655,10 @@ function confirmDeleteItem(id) {
   });
 }
 
-/* ===== SETTINGS MODAL ===== */
-function openSettingsModal() {
-  document.getElementById('modalContent').innerHTML = `
-    <div class="p-5">
-      <div class="flex items-center justify-between mb-5">
-        <div>
-          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">Configuration</p>
-          <h2 class="display text-2xl font-bold">Manage Lists</h2>
-        </div>
-        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-      
-      <div class="mb-6">
-        <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-2">Categories</p>
-        <div id="settingsCats" class="flex flex-wrap gap-2 mb-3 min-h-[40px]"></div>
-        <div class="flex gap-2">
-          <input id="newCatInput" type="text" placeholder="New category name" class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)] text-sm">
-          <button onclick="addCategory()" class="px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Add</button>
-        </div>
-      </div>
-
-      <div>
-        <p class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider mb-2">Units</p>
-        <div id="settingsUnits" class="flex flex-wrap gap-2 mb-3 min-h-[40px]"></div>
-        <div class="flex gap-2">
-          <input id="newUnitInput" type="text" placeholder="New unit name" class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)] text-sm">
-          <button onclick="addUnit()" class="px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white font-bold text-sm">Add</button>
-        </div>
-      </div>
-    </div>`;
-  renderSettingsLists();
-  showModal();
-}
-
-function renderSettingsLists() {
-  const catsEl = document.getElementById('settingsCats');
-  if (!catsEl) return;
-  catsEl.innerHTML = DB.categories.map(c => `
-    <div class="flex items-center gap-1.5 bg-white border border-[var(--border)] pl-3 pr-1.5 py-1.5 rounded-full text-xs font-bold">
-      <span>${c}</span>
-      <button onclick="deleteCategory('${c.replace(/'/g, "\\'")}')" class="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[10px] font-bold">×</button>
-    </div>
-  `).join('');
-
-  const unitsEl = document.getElementById('settingsUnits');
-  unitsEl.innerHTML = DB.units.map(u => `
-    <div class="flex items-center gap-1.5 bg-white border border-[var(--border)] pl-3 pr-1.5 py-1.5 rounded-full text-xs font-bold">
-      <span>${u}</span>
-      <button onclick="deleteUnit('${u.replace(/'/g, "\\'")}')" class="w-5 h-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-[10px] font-bold">×</button>
-    </div>
-  `).join('');
-}
-
-function addCategory() {
-  const input = document.getElementById('newCatInput');
-  const val = input.value.trim();
-  if (val && !DB.categories.includes(val)) {
-    DB.categories.push(val);
-    DB.categories.sort();
-    saveDB();
-    input.value = '';
-    renderSettingsLists();
-    toast('Category added');
-  } else if (DB.categories.includes(val)) {
-    toast('Already exists', 'error');
-  }
-}
-
-function deleteCategory(cat) {
-  if (DB.items.some(i => i.category === cat)) {
-    toast('Category in use', 'error'); return;
-  }
-  DB.categories = DB.categories.filter(c => c !== cat);
-  saveDB();
-  renderSettingsLists();
-  toast('Category deleted', 'info');
-}
-
-function addUnit() {
-  const input = document.getElementById('newUnitInput');
-  const val = input.value.trim();
-  if (val && !DB.units.includes(val)) {
-    DB.units.push(val);
-    saveDB();
-    input.value = '';
-    renderSettingsLists();
-    toast('Unit added');
-  } else if (DB.units.includes(val)) {
-    toast('Already exists', 'error');
-  }
-}
-
-function deleteUnit(unit) {
-  if (DB.items.some(i => i.unit === unit)) {
-    toast('Unit in use by items', 'error'); return;
-  }
-  if (DB.transactions.some(t => t.txnUnit === unit)) {
-    toast('Unit in use in entries', 'error'); return;
-  }
-  DB.units = DB.units.filter(u => u !== unit);
-  saveDB();
-  renderSettingsLists();
-  toast('Unit deleted', 'info');
-}
-
-
-/* ===== ITEM MODAL (Add/Edit) ===== */
+/* ===== ITEM MODAL ===== */
 function openItemModal(id) {
   const item = id ? DB.items.find(i => i.id === id) : null;
+  const allCats = [...DB.categories].sort();
 
   document.getElementById('modalContent').innerHTML = `
     <div class="p-5">
@@ -765,31 +674,30 @@ function openItemModal(id) {
       <form id="itemForm" onsubmit="saveItem(event, '${id || ''}')" class="space-y-3">
         <div>
           <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Item Code *</label>
-          <input required value="${item ? item.code : ''}" name="code" placeholder="e.g. ABR-007" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <input required value="${item ? item.code : ''}" name="code" placeholder="e.g. DRS-001" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
         </div>
         <div>
           <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Item Name *</label>
-          <input required value="${item ? item.name : ''}" name="name" placeholder="e.g. Napoleon Sandpaper 1500G" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <input required value="${item ? item.name : ''}" name="name" placeholder="e.g. Blue Dressing" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Unit *</label>
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Base Unit *</label>
             <select required name="unit" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
               ${DB.units.map(u => `<option value="${u}" ${item && item.unit === u ? 'selected' : ''}>${u}</option>`).join('')}
             </select>
           </div>
           <div>
-            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Category *</label>
-            <select required name="category" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
-              <option value="">Select...</option>
-              ${DB.categories.map(c => `<option value="${c}" ${item && item.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Category</label>
+            <select name="category" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+              ${allCats.map(c => `<option value="${c}" ${item && item.category === c ? 'selected' : ''}>${c}</option>`).join('')}
             </select>
           </div>
         </div>
         <div>
           <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Minimum Stock Alert Level</label>
-          <input type="number" min="0" value="${item ? item.minStock : 0}" name="minStock" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
-          <p class="text-[10px] text-[var(--muted)] mt-1">Alert when stock falls to this level.</p>
+          <input type="number" step="any" min="0" value="${item ? item.minStock : 0}" name="minStock" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <p class="text-[10px] text-[var(--muted)] mt-1">Alert when stock falls to this level (in Base Unit).</p>
         </div>
         <div class="flex gap-2 pt-3">
           <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[var(--border)] text-sm font-bold">Cancel</button>
@@ -808,11 +716,12 @@ function saveItem(e, id) {
     name: f.name.value.trim(),
     unit: f.unit.value,
     category: f.category.value,
-    minStock: parseInt(f.minStock.value) || 0
+    minStock: parseFloat(f.minStock.value) || 0
   };
-  if (!data.code || !data.name || !data.unit || !data.category) { toast('Fill required fields', 'error'); return; }
+  if (!data.code || !data.name) { toast('Fill required fields', 'error'); return; }
   const dup = DB.items.find(i => i.code.toLowerCase() === data.code.toLowerCase() && i.id !== id);
   if (dup) { toast('Code already exists', 'error'); return; }
+  
   if (id) {
     const idx = DB.items.findIndex(i => i.id === id);
     if (idx >= 0) DB.items[idx] = { ...DB.items[idx], ...data };
@@ -860,42 +769,44 @@ function openTxnModal() {
           <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Select Item *</label>
           <div class="relative mt-1.5">
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" id="txnItemSearch" oninput="filterTxnItems()" placeholder="Type item name or code..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="padding-left:38px;" class="w-full pr-3 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+            <input type="text" id="txnItemSearch" oninput="filterTxnItems()" placeholder="Type item name or code..." autocomplete="off" style="padding-left:38px;" class="w-full pr-3 py-2.5 rounded-xl bg-white border border-[var(--border)]">
           </div>
-          <div id="txnItemResults" class="mt-2 max-h-52 overflow-y-auto rounded-xl bg-white border border-[var(--border)] divide-y divide-[var(--border)]"></div>
+          <div id="txnItemResults" class="mt-2 max-h-48 overflow-y-auto rounded-xl bg-white border border-[var(--border)] divide-y divide-[var(--border)]"></div>
           <input type="hidden" name="itemId" id="txnItemId" value="">
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
-          <div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="col-span-1">
             <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Quantity *</label>
-            <input required type="number" min="1" step="any" name="qty" id="qtyInput" placeholder="0" inputmode="decimal" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+            <input required type="number" step="any" min="1" name="qty" id="qtyInput" oninput="updateConversionHint()" placeholder="0" inputmode="decimal" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
           </div>
-          <div>
+          <div class="col-span-1">
             <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Unit *</label>
-            <select required name="txnUnit" id="txnUnitSelect" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+            <select name="unit" id="txnUnitSelect" onchange="updateConversionHint()" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
               ${DB.units.map(u => `<option value="${u}">${u}</option>`).join('')}
             </select>
           </div>
+        </div>
+        <p id="conversionHint" class="text-[10px] text-[var(--accent)] font-bold hidden-field"></p>
+
+        <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Date</label>
             <input type="date" name="date" value="${todayStr()}" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
           </div>
-        </div>
-
-        <div id="companyField">
-          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Company / Source</label>
-          <select name="company" id="companySelect" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
-            <option value="">Select company...</option>
-            <option value="Carzspa">Carzspa</option>
-            <option value="Aftermarket">Aftermarket</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <div id="jobcardField" class="hidden-field">
-          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Jobcard No. *</label>
-          <input type="text" name="jobcard" id="jobcardInput" placeholder="e.g. JC-2405" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <div id="companyField">
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Company</label>
+            <select name="company" id="companySelect" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+              <option value="">Select...</option>
+              <option value="Carzspa">Carzspa</option>
+              <option value="Aftermarket">Aftermarket</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div id="jobcardField" class="hidden-field">
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Jobcard No. *</label>
+            <input type="text" name="jobcard" id="jobcardInput" placeholder="e.g. JC-2405" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          </div>
         </div>
 
         <div>
@@ -940,10 +851,9 @@ function renderTxnItemOptions(query) {
           <p class="text-[10px] text-[var(--muted)]">${it.code} · ${it.category}</p>
         </div>
         <div class="text-right flex-shrink-0">
-          <p class="text-xs font-bold ${stock <= 0 ? 'text-red-500' : stock <= it.minStock ? 'text-amber-600' : 'text-[var(--primary)]'}">${stock}</p>
+          <p class="text-xs font-bold ${stock <= 0 ? 'text-red-500' : stock <= it.minStock ? 'text-amber-600' : 'text-[var(--primary)]'}">${stock.toFixed(2)}</p>
           <p class="text-[9px] text-[var(--muted)]">${it.unit}</p>
         </div>
-        ${isSelected ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D5016" stroke-width="3" class="flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
       </div>`;
   }).join('');
 }
@@ -954,6 +864,8 @@ function filterTxnItems() {
   if (txnItemSelected) {
     txnItemSelected = null;
     document.getElementById('txnItemId').value = '';
+    document.getElementById('txnUnitSelect').value = '';
+    document.getElementById('conversionHint').classList.add('hidden-field');
   }
   renderTxnItemOptions(input.value);
 }
@@ -964,10 +876,32 @@ function selectTxnItem(id) {
   const item = DB.items.find(i => i.id === id);
   if (item) {
     document.getElementById('txnItemSearch').value = item.name;
-    // Set the unit dropdown to the item's default unit
     document.getElementById('txnUnitSelect').value = item.unit;
+    updateConversionHint();
   }
   renderTxnItemOptions(document.getElementById('txnItemSearch').value);
+}
+
+function updateConversionHint() {
+  if (!txnItemSelected) return;
+  const item = DB.items.find(i => i.id === txnItemSelected);
+  if (!item) return;
+  
+  const qty = parseFloat(document.getElementById('qtyInput').value) || 0;
+  const txnUnit = document.getElementById('txnUnitSelect').value;
+  const hint = document.getElementById('conversionHint');
+  
+  if (txnUnit !== item.unit) {
+    const baseQty = getBaseQty(qty, txnUnit, item.unit);
+    if (qty > 0) {
+      hint.textContent = `= ${baseQty.toFixed(3)} ${item.unit} (Base Unit)`;
+      hint.classList.remove('hidden-field');
+    } else {
+      hint.classList.add('hidden-field');
+    }
+  } else {
+    hint.classList.add('hidden-field');
+  }
 }
 
 function selectType(type) {
@@ -998,9 +932,9 @@ function saveTxn(e) {
   const type = f.type.value;
   const itemId = f.itemId.value;
   const qty = parseFloat(f.qty.value);
+  const unit = f.unit.value;
   const date = f.date.value || todayStr();
   const remark = f.remark.value.trim();
-  const txnUnit = f.txnUnit.value;
   const company = type === 'IN' ? (f.company.value || '') : '';
   const jobcard = type === 'OUT' ? (f.jobcard.value.trim() || '') : '';
 
@@ -1009,15 +943,205 @@ function saveTxn(e) {
   if (type === 'OUT' && !jobcard) { toast('Enter jobcard no.', 'error'); return; }
 
   if (type === 'OUT') {
+    const item = DB.items.find(i => i.id === itemId);
+    const baseQty = getBaseQty(qty, unit, item.unit);
     const cs = currentStock(itemId);
-    if (qty > cs) { toast('Only ' + cs + ' in stock', 'error'); return; }
+    if (baseQty > cs) { toast('Not enough stock. Only ' + cs.toFixed(2) + ' ' + item.unit + ' left', 'error'); return; }
   }
 
-  DB.transactions.push({ id: uid(), date, itemId, type, qty, txnUnit, company, jobcard, remark });
+  DB.transactions.push({ id: uid(), date, itemId, type, qty, unit, company, jobcard, remark });
   saveDB();
   closeModal();
   toast(type === 'IN' ? 'Stock added' : 'Stock issued');
   renderTab();
+}
+
+/* ===== SETTINGS MODAL (CATEGORIES & UNITS) ===== */
+function openSettingsModal() {
+  document.getElementById('modalContent').innerHTML = `
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">Configuration</p>
+          <h2 class="display text-2xl font-bold">Manage Masters</h2>
+        </div>
+        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Categories Section -->
+      <div class="mb-6">
+        <h3 class="text-sm font-bold mb-2 flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+          Categories
+        </h3>
+        <form onsubmit="addCategory(event)" class="flex gap-2 mb-3">
+          <input type="text" id="newCatInput" placeholder="Add new category..." autocomplete="off" class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold">Add</button>
+        </form>
+        <div id="catList" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <hr class="border-[var(--border)] my-5">
+
+      <!-- Units Section -->
+      <div class="mb-6">
+        <h3 class="text-sm font-bold mb-2 flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+          Units
+        </h3>
+        <form onsubmit="addUnit(event)" class="flex gap-2 mb-3">
+          <input type="text" id="newUnitInput" placeholder="Add new unit (e.g., Roll)..." autocomplete="off" class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <button type="submit" class="px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold">Add</button>
+        </form>
+        <div id="unitList" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <hr class="border-[var(--border)] my-5">
+
+      <!-- Conversions Section -->
+      <div class="mb-6">
+        <h3 class="text-sm font-bold mb-2 flex items-center gap-2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Unit Conversions
+        </h3>
+        <p class="text-[11px] text-[var(--muted)] mb-3">Define how sub-units convert to the base unit. E.g., 1 Litre = 1000 ml. The system uses these rules to auto-adjust stock.</p>
+        
+        <form onsubmit="addConversion(event)" class="grid grid-cols-12 gap-2 mb-3 items-center">
+          <div class="col-span-3 text-center text-xs font-bold text-[var(--muted)]">1</div>
+          <select id="convFrom" class="col-span-4 px-2 py-2.5 rounded-xl bg-white border border-[var(--border)] text-sm">
+            ${DB.units.map(u => `<option value="${u}">${u}</option>`).join('')}
+          </select>
+          <div class="col-span-1 text-center text-xs font-bold">=</div>
+          <input type="number" step="any" id="convFactor" placeholder="1000" required class="col-span-4 px-2 py-2.5 rounded-xl bg-white border border-[var(--border)] text-sm">
+          <select id="convTo" class="col-span-12 px-3 py-2.5 rounded-xl bg-white border border-[var(--border)] text-sm">
+            ${DB.units.map(u => `<option value="${u}">${u}</option>`).join('')}
+          </select>
+          <button type="submit" class="col-span-12 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold mt-1">Add Rule</button>
+        </form>
+        <div id="convList" class="space-y-2"></div>
+      </div>
+
+    </div>`;
+  renderSettingsLists();
+  showModal();
+}
+
+function renderSettingsLists() {
+  const catList = document.getElementById('catList');
+  if (catList) {
+    catList.innerHTML = DB.categories.map(c => `
+      <div class="flex items-center gap-1.5 bg-white border border-[var(--border)] pl-3 pr-1.5 py-1.5 rounded-full">
+        <span class="text-xs font-bold">${c}</span>
+        <button onclick="deleteCategory('${c.replace(/'/g, "\\'")}')" class="w-5 h-5 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+  
+  const unitList = document.getElementById('unitList');
+  if (unitList) {
+    unitList.innerHTML = DB.units.map(u => `
+      <div class="flex items-center gap-1.5 bg-white border border-[var(--border)] pl-3 pr-1.5 py-1.5 rounded-full">
+        <span class="text-xs font-bold">${u}</span>
+        <button onclick="deleteUnit('${u.replace(/'/g, "\\'")}')" class="w-5 h-5 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+
+  const convList = document.getElementById('convList');
+  if (convList) {
+    if (DB.conversions.length === 0) {
+      convList.innerHTML = '<p class="text-xs text-[var(--muted)] text-center py-3">No conversion rules yet.</p>';
+    } else {
+      convList.innerHTML = DB.conversions.map((c, i) => `
+        <div class="flex items-center justify-between bg-white border border-[var(--border)] p-3 rounded-xl">
+          <span class="text-sm font-bold">1 ${c.from} = ${c.factor} ${c.to}</span>
+          <button onclick="deleteConversion(${i})" class="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+function addCategory(e) {
+  e.preventDefault();
+  const input = document.getElementById('newCatInput');
+  const val = input.value.trim();
+  if (val && !DB.categories.includes(val)) {
+    DB.categories.push(val);
+    DB.categories.sort();
+    saveDB();
+    input.value = '';
+    renderSettingsLists();
+    toast('Category added');
+  }
+}
+
+function deleteCategory(cat) {
+  DB.categories = DB.categories.filter(c => c !== cat);
+  saveDB();
+  renderSettingsLists();
+  toast('Category removed', 'info');
+}
+
+function addUnit(e) {
+  e.preventDefault();
+  const input = document.getElementById('newUnitInput');
+  const val = input.value.trim();
+  if (val && !DB.units.includes(val)) {
+    DB.units.push(val);
+    saveDB();
+    input.value = '';
+    renderSettingsLists();
+    toast('Unit added');
+  }
+  // Refresh dropdowns in form
+  const convFrom = document.getElementById('convFrom');
+  const convTo = document.getElementById('convTo');
+  if (convFrom && convTo) {
+    convFrom.innerHTML = DB.units.map(u => `<option value="${u}">${u}</option>`).join('');
+    convTo.innerHTML = DB.units.map(u => `<option value="${u}">${u}</option>`).join('');
+  }
+}
+
+function deleteUnit(unit) {
+  DB.units = DB.units.filter(u => u !== unit);
+  DB.conversions = DB.conversions.filter(c => c.from !== unit && c.to !== unit);
+  saveDB();
+  renderSettingsLists();
+  toast('Unit removed', 'info');
+}
+
+function addConversion(e) {
+  e.preventDefault();
+  const from = document.getElementById('convFrom').value;
+  const to = document.getElementById('convTo').value;
+  const factor = parseFloat(document.getElementById('convFactor').value);
+  
+  if (from === to) { toast('Units must be different', 'error'); return; }
+  if (!factor || factor <= 0) { toast('Enter valid factor', 'error'); return; }
+  
+  // Overwrite existing rule if present
+  DB.conversions = DB.conversions.filter(c => !(c.from === from && c.to === to) && !(c.from === to && c.to === from));
+  DB.conversions.push({ from, to, factor });
+  saveDB();
+  document.getElementById('convFactor').value = '';
+  renderSettingsLists();
+  toast('Conversion rule added');
+}
+
+function deleteConversion(index) {
+  DB.conversions.splice(index, 1);
+  saveDB();
+  renderSettingsLists();
+  toast('Rule removed', 'info');
 }
 
 /* ===== EMPTY STATE ===== */
@@ -1048,29 +1172,37 @@ function closeModalBg(e) {
 
 /* ===== EXCEL EXPORT ===== */
 function exportToExcel() {
-  if (DB.items.length === 0) { toast('No data to export', 'error'); return; }
+  if (DB.items.length === 0 && DB.transactions.length === 0) { toast('No data to export', 'error'); return; }
 
+  // Sheet 1: Stock Summary
   const summary = DB.items.map(it => {
     const s = currentStock(it.id);
     let inT = 0, outT = 0;
-    DB.transactions.forEach(t => { if (t.itemId === it.id) { if (t.type === 'IN') inT += t.qty; else outT += t.qty; } });
+    DB.transactions.forEach(t => {
+      if (t.itemId === it.id) {
+        const baseQty = getBaseQty(t.qty, t.unit, it.unit);
+        if (t.type === 'IN') inT += baseQty; else outT += baseQty;
+      }
+    });
     return {
       'Code': it.code,
       'Item Name': it.name,
       'Category': it.category,
-      'Unit': it.unit,
-      'Total In': inT,
-      'Total Out': outT,
-      'Current Stock': s,
+      'Base Unit': it.unit,
+      'Total In': inT.toFixed(3),
+      'Total Out': outT.toFixed(3),
+      'Current Stock': s.toFixed(3),
       'Min Required': it.minStock,
       'Status': s <= 0 ? 'Out of Stock' : s <= it.minStock ? 'Low Stock' : 'In Stock'
     };
   });
 
+  // Sheet 2: In/Out Entries
   const txns = [...DB.transactions]
     .sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id))
     .map(t => {
       const it = DB.items.find(i => i.id === t.itemId);
+      const baseQty = it ? getBaseQty(t.qty, t.unit, it.unit) : t.qty;
       return {
         'Date': t.date,
         'Type': t.type === 'IN' ? 'Stock In' : 'Stock Out',
@@ -1078,28 +1210,31 @@ function exportToExcel() {
         'Company': t.company || '',
         'Code': it ? it.code : '',
         'Item Name': it ? it.name : 'Unknown',
-        'Quantity': t.qty,
-        'Unit': t.txnUnit || (it ? it.unit : ''),
+        'Qty Entered': t.qty,
+        'Unit Used': t.unit,
+        'Qty in Base': baseQty.toFixed(3),
+        'Base Unit': it ? it.unit : '',
         'Remarks': t.remark || ''
       };
     });
 
+  // Sheet 3: Item Masters
   const masters = DB.items.map(it => ({
     'Code': it.code,
     'Item Name': it.name,
     'Category': it.category,
-    'Unit': it.unit,
+    'Base Unit': it.unit,
     'Min Stock': it.minStock
   }));
 
   const wb = XLSX.utils.book_new();
 
   const ws1 = XLSX.utils.json_to_sheet(summary);
-  ws1['!cols'] = [{ wch: 12 }, { wch: 35 }, { wch: 18 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 13 }, { wch: 12 }, { wch: 14 }];
+  ws1['!cols'] = [{ wch: 12 }, { wch: 35 }, { wch: 18 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 13 }, { wch: 12 }, { wch: 14 }];
   XLSX.utils.book_append_sheet(wb, ws1, 'Stock Summary');
 
   const ws2 = XLSX.utils.json_to_sheet(txns);
-  ws2['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 35 }, { wch: 10 }, { wch: 10 }, { wch: 25 }];
+  ws2['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 35 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 25 }];
   XLSX.utils.book_append_sheet(wb, ws2, 'In Out Entries');
 
   const ws3 = XLSX.utils.json_to_sheet(masters);

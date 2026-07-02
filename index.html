@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CarzSpa Stock">
+<meta name="theme-color" content="#2D5016">
+<title>CarzSpa — Stock Manager</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Fraunces:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F1E8;
+    --bg-soft: #EDE6D3;
+    --card: #FFFFFF;
+    --fg: #1A2419;
+    --muted: #6B7568;
+    --primary: #2D5016;
+    --primary-2: #4A7C2A;
+    --accent: #E07A2B;
+    --accent-2: #F4A261;
+    --danger: #C73E1D;
+    --border: #E5DFD0;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    font-family: 'Manrope', sans-serif;
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    background-image:
+      radial-gradient(at 15% -5%, rgba(224,122,43,.10) 0, transparent 45%),
+      radial-gradient(at 90% 110%, rgba(45,80,22,.08) 0, transparent 45%);
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: calc(82px + var(--safe-bottom));
+    overflow-x: hidden;
+    touch-action: manipulation;
+  }
+  .display { font-family: 'Fraunces', serif; letter-spacing: -0.02em; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  input, select, textarea { font-size: 16px !important; }
+
+  .tab-active { color: var(--primary) !important; }
+  .tab-active .tab-icon { background: var(--primary); color: #fff; }
+  .tab-icon { transition: all .25s ease; }
+
+  @keyframes slideUp { from { transform: translateY(110%); } to { transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes toastIn { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+  @keyframes toastOut { to { transform: translate(-50%, -20px); opacity: 0; } }
+  @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+  .modal-enter { animation: slideUp .35s cubic-bezier(.16,1,.3,1); }
+  .overlay-enter { animation: fadeIn .2s ease-out; }
+  .tab-content { animation: fadeIn .25s ease-out; }
+  .toast-in { animation: toastIn .3s cubic-bezier(.16,1,.3,1) forwards; }
+  .toast-out { animation: toastOut .3s ease-in forwards; }
+  .pulse { animation: pulse-soft 1.8s infinite; }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(45,80,22,.12);
+  }
+  .card-press { transition: transform .12s ease; }
+  .card-press:active { transform: scale(.98); }
+
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .35;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  }
+
+  .stock-bar { height: 6px; border-radius: 3px; background: var(--bg-soft); overflow: hidden; }
+  .stock-bar > span {
+    display: block; height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, var(--primary-2), var(--primary));
+    transition: width .5s cubic-bezier(.16,1,.3,1);
+  }
+  .stock-bar.low > span { background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+  .stock-bar.out > span { background: var(--danger); width: 100% !important; }
+
+  .chip-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+  .chip-scroll::-webkit-scrollbar { display: none; }
+
+  .item-option { transition: background .15s; }
+  .item-option:active { background: var(--bg-soft); }
+
+  .mini-toast {
+    position: fixed;
+    top: calc(var(--safe-top) + 6px);
+    left: 50%; transform: translateX(-50%);
+    z-index: 200;
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    font-size: 12px; font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .modal-open { position: fixed; width: 100%; overflow: hidden; }
+  .hidden-field { display: none; }
+  
+  @supports (height: 100dvh) {
+    .modal-sheet { max-height: 88dvh; }
+  }
+</style>
+</head>
+<body class="relative">
+<div class="grain"></div>
+<div id="toastContainer"></div>
+
+<!-- Header -->
+<header class="sticky top-0 z-40 bg-[var(--bg)]/85 backdrop-blur-xl border-b border-[var(--border)]" style="padding-top: var(--safe-top);">
+  <div class="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-2)] flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/><circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/></svg>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="display text-xl font-bold leading-none">CarzSpa</h1>
+          <span class="text-[9px] font-bold bg-[var(--accent)]/15 text-[var(--accent)] px-2 py-0.5 rounded-full uppercase tracking-wider">Made By Anas</span>
+        </div>
+        <p class="text-[10px] text-[var(--muted)] uppercase tracking-[0.15em] font-semibold mt-0.5">Stock Manager</p>
+      </div>
+    </div>
+    <button onclick="exportToExcel()" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[var(--primary)] text-white text-xs font-bold active:scale-95 transition shadow-md shadow-[var(--primary)]/20">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Excel</span>
+    </button>
+  </div>
+</header>
+
+<main class="max-w-2xl mx-auto px-4 py-4 relative z-10">
+  <section class="mb-5">
+    <div class="bg-gradient-to-br from-[var(--primary)] to-[var(--primary-2)] rounded-3xl p-5 text-white relative overflow-hidden shadow-xl shadow-[var(--primary)]/20">
+      <div class="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-white/5"></div>
+      <div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full bg-[var(--accent)]/15"></div>
+      <div class="relative">
+        <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-white/70">Inventory Overview</p>
+        <div class="flex items-end justify-between mt-1">
+          <div>
+            <p class="display text-5xl font-black leading-none" id="heroStock">0</p>
+            <p class="text-xs text-white/80 mt-1.5 font-medium">Total units in stock</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] uppercase tracking-wider text-white/60 font-bold">Today</p>
+            <p class="display text-2xl font-bold" id="heroToday">0</p>
+            <p class="text-[10px] text-white/70">movements</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/15">
+          <div>
+            <p class="text-[10px] text-white/60 uppercase font-bold">Items</p>
+            <p class="text-lg font-bold display" id="statItems">0</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-white/60 uppercase font-bold">Low Stock</p>
+            <p class="text-lg font-bold display text-[var(--accent-2)]" id="statLow">0</p>
+          </div>
+          <div>
+            <p class="text-[10px] text-white/60 uppercase font-bold">Out of Stock</p>
+            <p class="text-lg font-bold display text-red-200" id="statOut">0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="tabContent" class="tab-content"></div>
+</main>
+
+<!-- Bottom nav -->
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[var(--border)]" style="padding-bottom: var(--safe-bottom);">
+  <div class="max-w-2xl mx-auto grid grid-cols-3 px-4 py-2">
+    <button onclick="switchTab('summary')" data-tab="summary" class="tab-btn tab-active flex flex-col items-center gap-1 py-1.5">
+      <div class="tab-icon w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--bg-soft)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      </div>
+      <span class="text-[10px] font-bold">Summary</span>
+    </button>
+    <button onclick="switchTab('inout')" data-tab="inout" class="tab-btn flex flex-col items-center gap-1 py-1.5 text-[var(--muted)]">
+      <div class="tab-icon w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--bg-soft)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      </div>
+      <span class="text-[10px] font-bold">In / Out</span>
+    </button>
+    <button onclick="switchTab('masters')" data-tab="masters" class="tab-btn flex flex-col items-center gap-1 py-1.5 text-[var(--muted)]">
+      <div class="tab-icon w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--bg-soft)]">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+      </div>
+      <span class="text-[10px] font-bold">Items</span>
+    </button>
+  </div>
+</nav>
+
+<!-- FAB -->
+<button id="fab" onclick="fabAction()" class="fixed z-30 w-14 h-14 rounded-2xl bg-[var(--accent)] text-white shadow-xl shadow-[var(--accent)]/40 flex items-center justify-center active:scale-90 transition-transform" style="bottom: calc(82px + var(--safe-bottom)); right: 16px;">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<!-- Modal -->
+<div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm" onclick="closeModalBg(event)">
+  <div id="modalContent" class="modal-sheet absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl bg-[var(--bg)] rounded-t-3xl modal-enter overflow-y-auto shadow-2xl" style="max-height: 88vh; padding-bottom: var(--safe-bottom);"></div>
+</div>
+
+<script>
+/* ===== CONSTANTS ===== */
+const DEFAULT_CATEGORIES = [
+  'Abrasives', 'Polishing Pads', 'Brushes', 'Microfibre & Towels',
+  'Applicators', 'Compounds & Polishes', 'Cleaners', 'Dressing',
+  'Ceramic Coating', 'PPF', 'Wash Accessories'
+];
+const COMPANIES = ['Carzspa', 'Aftermarket', 'Other'];
+const UNITS = ['Piece', 'Pack', 'Set', 'Pair', 'Bottle', 'Can', 'Drum', 'Roll', 'Box'];
+
+/* ===== DATA LAYER ===== */
+let DB = { items: [], transactions: [], categories: [] };
+let currentTab = 'summary';
+let txnItemSelected = null;
+let summaryFilter = 'ALL';
+let summaryCategory = 'ALL';
+let txnFilter = 'ALL';
+let masterCategory = 'ALL';
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function todayStr() {
+  const d = new Date();
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off * 60000);
+  return local.toISOString().split('T')[0];
+}
+
+function loadDB() {
+  try {
+    const saved = localStorage.getItem('carzspa_stock_v2'); // version bumped to clear old data
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && Array.isArray(parsed.items) && Array.isArray(parsed.transactions)) {
+        DB = parsed;
+        if (!DB.categories || DB.categories.length === 0) {
+          DB.categories = [...DEFAULT_CATEGORIES];
+        }
+        return;
+      }
+    }
+  } catch(e) { console.warn('Load error:', e); }
+  
+  // Fresh DB
+  DB = {
+    items: [],
+    transactions: [],
+    categories: [...DEFAULT_CATEGORIES]
+  };
+  saveDB();
+}
+
+function saveDB() {
+  try {
+    localStorage.setItem('carzspa_stock_v2', JSON.stringify(DB));
+  } catch(e) {
+    console.error('Save error:', e);
+    toast('Storage full', 'error');
+  }
+}
+
+function currentStock(itemId) {
+  let s = 0;
+  for (const t of DB.transactions) {
+    if (t.itemId === itemId) s += (t.type === 'IN' ? t.qty : -t.qty);
+  }
+  return s;
+}
+
+/* ===== MINI TOAST ===== */
+function toast(msg, type) {
+  type = type || 'success';
+  const colors = { success: '#2D5016', error: '#C73E1D', info: '#E07A2B' };
+  const icons = {
+    success: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+  };
+  const el = document.createElement('div');
+  el.className = 'mini-toast toast-in';
+  el.style.background = colors[type];
+  el.innerHTML = icons[type] + '<span>' + msg + '</span>';
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.classList.remove('toast-in');
+    el.classList.add('toast-out');
+    setTimeout(() => el.remove(), 300);
+  }, 1800);
+}
+
+/* ===== CONFIRM MODAL ===== */
+function confirmAction(message, onYes) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="p-6 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-red-100 mx-auto mb-4 flex items-center justify-center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#C73E1D" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </div>
+      <h2 class="display text-xl font-bold mb-1.5">Please Confirm</h2>
+      <p class="text-sm text-[var(--muted)] mb-5 leading-relaxed">${message}</p>
+      <div class="flex gap-2">
+        <button onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[var(--border)] text-sm font-bold">Cancel</button>
+        <button id="confirmYesBtn" class="flex-1 py-3 rounded-xl bg-[var(--danger)] text-white text-sm font-bold">Delete</button>
+      </div>
+    </div>`;
+  overlay.classList.remove('hidden');
+  overlay.classList.add('overlay-enter');
+  document.body.classList.add('modal-open');
+  document.getElementById('confirmYesBtn').onclick = function() { closeModal(); onYes(); };
+}
+
+/* ===== TAB ROUTING ===== */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    const active = b.dataset.tab === tab;
+    b.classList.toggle('tab-active', active);
+    b.classList.toggle('text-[var(--muted)]', !active);
+  });
+  const c = document.getElementById('tabContent');
+  c.classList.remove('tab-content'); void c.offsetWidth; c.classList.add('tab-content');
+  renderTab();
+}
+
+function renderTab() {
+  const c = document.getElementById('tabContent');
+  if (currentTab === 'summary') renderSummary(c);
+  else if (currentTab === 'inout') renderInOut(c);
+  else renderMasters(c);
+  renderStats();
+  updateFAB();
+}
+
+function updateFAB() {
+  const fab = document.getElementById('fab');
+  fab.style.display = (currentTab === 'inout' || currentTab === 'masters') ? 'flex' : 'none';
+}
+
+function fabAction() {
+  if (currentTab === 'inout') openTxnModal();
+  else if (currentTab === 'masters') openItemModal();
+}
+
+function renderStats() {
+  let totalStock = 0, lowCount = 0, outCount = 0;
+  DB.items.forEach(it => {
+    const s = currentStock(it.id);
+    totalStock += Math.max(0, s);
+    if (s <= 0) outCount++;
+    else if (s <= it.minStock) lowCount++;
+  });
+  document.getElementById('heroStock').textContent = totalStock;
+  document.getElementById('heroToday').textContent = DB.transactions.filter(t => t.date === todayStr()).length;
+  document.getElementById('statItems').textContent = DB.items.length;
+  document.getElementById('statLow').textContent = lowCount;
+  document.getElementById('statOut').textContent = outCount;
+}
+
+/* ===== SUMMARY TAB ===== */
+function renderSummary(container) {
+  if (DB.items.length === 0) {
+    container.innerHTML = emptyState('No items yet', 'Add items in the Items tab to begin.', 'masters');
+    return;
+  }
+  const cats = ['ALL', ...DB.categories];
+  container.innerHTML = `
+    <div class="chip-scroll flex gap-2 mb-2 overflow-x-auto pb-1">
+      ${[['ALL','All'],['LOW','Low Stock'],['OUT','Out of Stock'],['OK','In Stock']].map(([k,l]) => `
+        <button onclick="setSummaryFilter('${k}')" class="px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${summaryFilter===k ? 'bg-[var(--primary)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${l}</button>
+      `).join('')}
+    </div>
+    <div class="chip-scroll flex gap-2 mb-3 overflow-x-auto pb-1">
+      ${cats.map(c => `
+        <button onclick="setSummaryCategory('${c}')" class="px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition ${summaryCategory===c ? 'bg-[var(--accent)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
+      `).join('')}
+    </div>
+    <div class="relative mb-3">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="searchSummary" oninput="renderSummaryList()" type="text" placeholder="Search items..." autocomplete="off" style="padding-left:38px;" class="w-full pr-4 py-3 rounded-xl bg-white border border-[var(--border)] text-sm">
+    </div>
+    <div id="summaryList" class="space-y-2.5"></div>
+  `;
+  renderSummaryList();
+}
+
+function setSummaryFilter(k) { summaryFilter = k; renderSummary(document.getElementById('tabContent')); }
+function setSummaryCategory(c) { summaryCategory = c; renderSummary(document.getElementById('tabContent')); }
+
+function renderSummaryList() {
+  const list = document.getElementById('summaryList');
+  if (!list) return;
+  const q = (document.getElementById('searchSummary')?.value || '').toLowerCase().trim();
+  let items = DB.items.filter(it => {
+    if (summaryCategory !== 'ALL' && it.category !== summaryCategory) return false;
+    if (q && !it.name.toLowerCase().includes(q) && !it.code.toLowerCase().includes(q)) return false;
+    const s = currentStock(it.id);
+    if (summaryFilter === 'LOW') return s > 0 && s <= it.minStock;
+    if (summaryFilter === 'OUT') return s <= 0;
+    if (summaryFilter === 'OK') return s > it.minStock;
+    return true;
+  });
+
+  if (items.length === 0) {
+    list.innerHTML = '<p class="text-center text-[var(--muted)] py-10 text-sm">No items match</p>';
+    return;
+  }
+
+  list.innerHTML = items.map(it => {
+    const stock = currentStock(it.id);
+    const isOut = stock <= 0;
+    const isLow = !isOut && stock <= it.minStock;
+    let inT = 0, outT = 0;
+    DB.transactions.forEach(t => { if (t.itemId === it.id) { if (t.type==='IN') inT += t.qty; else outT += t.qty; } });
+    const pct = Math.min(100, Math.max(4, (stock / Math.max(it.minStock * 2, 1)) * 100));
+    const barClass = isOut ? 'out' : isLow ? 'low' : '';
+    let badge = '';
+    if (isOut) badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700">OUT</span>';
+    else if (isLow) badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 pulse">LOW</span>';
+    else badge = '<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800">OK</span>';
+
+    return `
+      <div class="card-press bg-white rounded-2xl p-4 border border-[var(--border)]">
+        <div class="flex items-start justify-between gap-2 mb-2">
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm truncate">${it.name}</p>
+            <p class="text-[11px] text-[var(--muted)] mt-0.5">${it.code} · ${it.category}</p>
+          </div>
+          ${badge}
+        </div>
+        <div class="stock-bar ${barClass} mb-3"><span style="width:${pct}%"></span></div>
+        <div class="grid grid-cols-4 gap-2 items-end">
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">In</p><p class="text-sm font-bold text-[var(--primary)]">+${inT}</p></div>
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Out</p><p class="text-sm font-bold text-[var(--danger)]">-${outT}</p></div>
+          <div><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Balance</p><p class="display text-xl font-black ${isOut ? 'text-[var(--danger)]' : isLow ? 'text-[var(--accent)]' : 'text-[var(--fg)]'}">${stock}</p></div>
+          <div class="text-right"><p class="text-[9px] text-[var(--muted)] uppercase font-bold">Unit / Min</p><p class="text-xs font-bold">${it.unit}</p><p class="text-[10px] text-[var(--muted)]">min ${it.minStock}</p></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ===== IN/OUT TAB ===== */
+function renderInOut(container) {
+  container.innerHTML = `
+    <div class="flex gap-2 mb-3">
+      ${[['ALL','All'],['IN','Stock In'],['OUT','Stock Out']].map(([k,l]) => `
+        <button onclick="setTxnFilter('${k}')" class="flex-1 py-2.5 rounded-xl text-xs font-bold transition ${txnFilter===k ? 'bg-[var(--primary)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${l}</button>
+      `).join('')}
+    </div>
+    <div id="txnList" class="space-y-3"></div>
+  `;
+  renderTxnList();
+}
+
+function setTxnFilter(k) { txnFilter = k; renderInOut(document.getElementById('tabContent')); }
+
+function renderTxnList() {
+  const list = document.getElementById('txnList');
+  if (!list) return;
+  let txns = [...DB.transactions].sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  if (txnFilter !== 'ALL') txns = txns.filter(t => t.type === txnFilter);
+
+  if (txns.length === 0) {
+    list.innerHTML = emptyState('No entries yet', 'Tap + to record stock in or out.', null);
+    return;
+  }
+
+  const groups = {};
+  txns.forEach(t => { (groups[t.date] = groups[t.date] || []).push(t); });
+  const dates = Object.keys(groups).sort().reverse();
+
+  list.innerHTML = dates.map(date => {
+    const d = new Date(date + 'T00:00');
+    const today = todayStr();
+    const yest = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    let label = d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+    if (date === today) label = 'Today';
+    else if (date === yest) label = 'Yesterday';
+    let dayIn = 0, dayOut = 0;
+    groups[date].forEach(t => t.type === 'IN' ? dayIn += t.qty : dayOut += t.qty);
+
+    return `
+      <div>
+        <div class="flex items-center justify-between px-1 mb-2">
+          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">${label}</p>
+          <p class="text-[10px] text-[var(--muted)] font-semibold">+${dayIn} / -${dayOut}</p>
+        </div>
+        ${groups[date].map(t => {
+          const item = DB.items.find(i => i.id === t.itemId);
+          const isIn = t.type === 'IN';
+          const metaParts = [];
+          if (!isIn && t.jobcard) metaParts.push('JC: ' + t.jobcard);
+          if (isIn && t.company) metaParts.push(t.company);
+          if (t.remark) metaParts.push(t.remark);
+          const meta = metaParts.join(' · ') || '—';
+          return `
+            <div class="card-press bg-white rounded-2xl p-3 border border-[var(--border)] flex items-center gap-3 mb-2">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${isIn ? 'bg-green-100' : 'bg-red-100'}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isIn ? '#2D5016' : '#C73E1D'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  ${isIn ? '<path d="M12 19V5M5 12l7-7 7 7"/>' : '<path d="M12 5v14M19 12l-7 7-7-7"/>'}
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="font-bold text-sm truncate">${item ? item.name : 'Unknown'}</p>
+                <p class="text-[11px] text-[var(--muted)] truncate">${meta}</p>
+                ${item ? `<span class="inline-block text-[9px] font-bold px-1.5 py-0.5 rounded bg-[var(--bg-soft)] text-[var(--muted)] mt-1">${item.code}</span>` : ''}
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="font-bold text-base ${isIn ? 'text-[var(--primary)]' : 'text-[var(--danger)]'}">${isIn ? '+' : '-'}${t.qty}</p>
+                <button onclick="confirmDeleteTxn('${t.id}')" class="text-[10px] text-[var(--muted)] mt-0.5 font-semibold">Delete</button>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+}
+
+function confirmDeleteTxn(id) {
+  confirmAction('Delete this stock entry? This cannot be undone.', () => {
+    DB.transactions = DB.transactions.filter(t => t.id !== id);
+    saveDB(); toast('Entry deleted', 'info'); renderTab();
+  });
+}
+
+/* ===== MASTERS TAB ===== */
+function renderMasters(container) {
+  const cats = ['ALL', ...DB.categories];
+  container.innerHTML = `
+    <div class="chip-scroll flex gap-2 mb-3 overflow-x-auto pb-1 items-center">
+      ${cats.map(c => `
+        <button onclick="setMasterCategory('${c}')" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${masterCategory===c ? 'bg-[var(--primary)] text-white' : 'bg-white border border-[var(--border)] text-[var(--muted)]'}">${c==='ALL'?'All Categories':c}</button>
+      `).join('')}
+      <button onclick="openCategoryModal()" class="px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap bg-[var(--accent)] text-white flex items-center gap-1 flex-shrink-0">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Manage
+      </button>
+    </div>
+    <div class="relative mb-3">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="searchMaster" oninput="renderMasterList()" type="text" placeholder="Search by name or code..." autocomplete="off" style="padding-left:38px;" class="w-full pr-4 py-3 rounded-xl bg-white border border-[var(--border)] text-sm">
+    </div>
+    <div id="masterList" class="space-y-2.5"></div>
+  `;
+  renderMasterList();
+}
+
+function setMasterCategory(c) { masterCategory = c; renderMasters(document.getElementById('tabContent')); }
+
+function renderMasterList() {
+  const list = document.getElementById('masterList');
+  if (!list) return;
+  const q = (document.getElementById('searchMaster')?.value || '').toLowerCase().trim();
+  let items = DB.items.filter(it => {
+    if (masterCategory !== 'ALL' && it.category !== masterCategory) return false;
+    if (q && !it.name.toLowerCase().includes(q) && !it.code.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (items.length === 0) {
+    list.innerHTML = emptyState('No items found', 'Tap + to add a new item.', null);
+    return;
+  }
+
+  list.innerHTML = items.map(it => {
+    const stock = currentStock(it.id);
+    return `
+      <div class="card-press bg-white rounded-2xl p-4 border border-[var(--border)]">
+        <div class="flex items-start justify-between gap-2 mb-1">
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm">${it.name}</p>
+            <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[11px] text-[var(--muted)]">
+              <span>Code: <b class="text-[var(--fg)]">${it.code}</b></span>
+              <span>Unit: <b class="text-[var(--fg)]">${it.unit}</b></span>
+              <span>Cat: <b class="text-[var(--fg)]">${it.category}</b></span>
+              <span>Min: <b class="text-[var(--fg)]">${it.minStock}</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border)]">
+          <div>
+            <p class="text-[10px] text-[var(--muted)] uppercase font-bold">Current Stock</p>
+            <p class="display text-2xl font-black ${stock <= 0 ? 'text-[var(--danger)]' : stock <= it.minStock ? 'text-[var(--accent)]' : 'text-[var(--primary)]'}">${stock} <span class="text-xs font-medium text-[var(--muted)]">${it.unit}</span></p>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openItemModal('${it.id}')" class="px-3.5 py-2 rounded-lg bg-[var(--bg-soft)] border border-[var(--border)] text-xs font-bold active:scale-95">Edit</button>
+            <button onclick="confirmDeleteItem('${it.id}')" class="px-3.5 py-2 rounded-lg bg-red-50 text-red-600 border border-red-100 text-xs font-bold active:scale-95">Delete</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function confirmDeleteItem(id) {
+  const it = DB.items.find(i => i.id === id);
+  if (!it) return;
+  const txns = DB.transactions.filter(t => t.itemId === id);
+  const msg = txns.length > 0
+    ? `"${it.name}" has ${txns.length} transaction(s). Deleting will also remove them.`
+    : `Delete "${it.name}"?`;
+  confirmAction(msg, () => {
+    DB.transactions = DB.transactions.filter(t => t.itemId !== id);
+    DB.items = DB.items.filter(i => i.id !== id);
+    saveDB(); toast('Item deleted', 'info'); renderTab();
+  });
+}
+
+/* ===== CATEGORY MODAL ===== */
+function openCategoryModal() {
+  document.getElementById('modalContent').innerHTML = `
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">Configure</p>
+          <h2 class="display text-2xl font-bold">Categories</h2>
+        </div>
+        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="addCategory(event)" class="flex gap-2 mb-4">
+        <input required id="newCatInput" placeholder="Enter new category name" autocomplete="off" class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+        <button type="submit" class="px-4 py-2.5 rounded-xl bg-[var(--primary)] text-white text-sm font-bold">Add</button>
+      </form>
+      <div class="space-y-2">
+        ${DB.categories.map(c => {
+          const count = DB.items.filter(i => i.category === c).length;
+          return `
+            <div class="flex items-center justify-between p-3 bg-white border border-[var(--border)] rounded-xl">
+              <div>
+                <span class="font-bold text-sm">${c}</span>
+                <span class="text-[10px] text-[var(--muted)] ml-2">${count} item(s)</span>
+              </div>
+              <button onclick="deleteCategory('${c}')" class="text-[var(--danger)] text-xs font-bold px-2.5 py-1.5 rounded-lg bg-red-50 border border-red-100">Remove</button>
+            </div>
+          `;
+        }).join('')}
+        ${DB.categories.length === 0 ? '<p class="text-center text-[var(--muted)] py-6 text-sm">No categories yet. Add one above.</p>' : ''}
+      </div>
+    </div>`;
+  showModal();
+}
+
+function addCategory(e) {
+  e.preventDefault();
+  const input = document.getElementById('newCatInput');
+  const val = input.value.trim();
+  if (val && !DB.categories.includes(val)) {
+    DB.categories.push(val);
+    DB.categories.sort();
+    saveDB();
+    toast('Category added');
+    openCategoryModal(); // Refresh modal
+    renderTab();
+  } else if (DB.categories.includes(val)) {
+    toast('Already exists', 'error');
+  }
+}
+
+function deleteCategory(cat) {
+  const inUse = DB.items.some(i => i.category === cat);
+  if (inUse) {
+    toast('Category in use', 'error');
+    return;
+  }
+  DB.categories = DB.categories.filter(c => c !== cat);
+  saveDB();
+  toast('Category removed', 'info');
+  openCategoryModal();
+  renderTab();
+}
+
+/* ===== ITEM MODAL (Add/Edit) ===== */
+function openItemModal(id) {
+  if (DB.categories.length === 0) {
+    toast('Add a category first', 'error');
+    openCategoryModal();
+    return;
+  }
+  
+  const item = id ? DB.items.find(i => i.id === id) : null;
+  const allCats = [...DB.categories].sort();
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">${item ? 'Edit' : 'New'} Item</p>
+          <h2 class="display text-2xl font-bold">${item ? 'Update Item' : 'Add Item'}</h2>
+        </div>
+        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="itemForm" onsubmit="saveItem(event, '${id || ''}')" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Item Code *</label>
+          <input required value="${item ? item.code : ''}" name="code" placeholder="e.g. ABR-007" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Item Name *</label>
+          <input required value="${item ? item.name : ''}" name="name" placeholder="e.g. Napoleon Sandpaper 1500G" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Unit *</label>
+            <input required value="${item ? item.unit : ''}" name="unit" list="unitList" placeholder="e.g. Piece" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+            <datalist id="unitList">${UNITS.map(u => `<option>${u}</option>`).join('')}</datalist>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Category *</label>
+            <select required name="category" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+              ${allCats.map(c => `<option value="${c}" ${item && item.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Minimum Stock Alert Level</label>
+          <input type="number" min="0" value="${item ? item.minStock : 0}" name="minStock" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          <p class="text-[10px] text-[var(--muted)] mt-1">Alert when stock falls to this level.</p>
+        </div>
+        <div class="flex gap-2 pt-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[var(--border)] text-sm font-bold">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-[var(--primary)] text-white text-sm font-bold shadow-md shadow-[var(--primary)]/20">${item ? 'Update' : 'Add Item'}</button>
+        </div>
+      </form>
+    </div>`;
+  showModal();
+}
+
+function saveItem(e, id) {
+  e.preventDefault();
+  const f = e.target;
+  const data = {
+    code: f.code.value.trim(),
+    name: f.name.value.trim(),
+    unit: f.unit.value.trim() || 'Piece',
+    category: f.category.value.trim() || 'General',
+    minStock: parseInt(f.minStock.value) || 0
+  };
+  if (!data.code || !data.name) { toast('Fill required fields', 'error'); return; }
+  const dup = DB.items.find(i => i.code.toLowerCase() === data.code.toLowerCase() && i.id !== id);
+  if (dup) { toast('Code already exists', 'error'); return; }
+  if (id) {
+    const idx = DB.items.findIndex(i => i.id === id);
+    if (idx >= 0) DB.items[idx] = { ...DB.items[idx], ...data };
+    toast('Item updated');
+  } else {
+    DB.items.push({ id: uid(), ...data });
+    toast('Item added');
+  }
+  saveDB(); closeModal(); renderTab();
+}
+
+/* ===== TRANSACTION MODAL ===== */
+function openTxnModal() {
+  if (DB.items.length === 0) {
+    toast('Add items first', 'error');
+    switchTab('masters');
+    return;
+  }
+  txnItemSelected = null;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="p-5">
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <p class="text-[10px] uppercase tracking-[0.15em] font-bold text-[var(--muted)]">New Entry</p>
+          <h2 class="display text-2xl font-bold">Stock Movement</h2>
+        </div>
+        <button onclick="closeModal()" class="w-9 h-9 rounded-xl bg-white border border-[var(--border)] flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="txnForm" onsubmit="saveTxn(event)" class="space-y-3">
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="typeIN" onclick="selectType('IN')" class="py-3.5 rounded-xl bg-green-100 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm flex items-center justify-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            Stock In
+          </button>
+          <button type="button" id="typeOUT" onclick="selectType('OUT')" class="py-3.5 rounded-xl bg-white border-2 border-[var(--border)] text-[var(--muted)] font-bold text-sm flex items-center justify-center gap-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            Stock Out
+          </button>
+        </div>
+        <input type="hidden" name="type" id="typeField" value="IN">
+
+        <div>
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Select Item *</label>
+          <div class="relative mt-1.5">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="txnItemSearch" oninput="filterTxnItems()" placeholder="Type item name or code..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="padding-left:38px;" class="w-full pr-3 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          </div>
+          <div id="txnItemResults" class="mt-2 max-h-52 overflow-y-auto rounded-xl bg-white border border-[var(--border)] divide-y divide-[var(--border)]"></div>
+          <input type="hidden" name="itemId" id="txnItemId" value="">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Quantity *</label>
+            <input required type="number" min="1" name="qty" id="qtyInput" placeholder="0" inputmode="numeric" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Date</label>
+            <input type="date" name="date" value="${todayStr()}" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+          </div>
+        </div>
+
+        <div id="companyField">
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Company / Source</label>
+          <select name="company" id="companySelect" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+            <option value="">Select company...</option>
+            ${COMPANIES.map(c => `<option value="${c}">${c}</option>`).join('')}
+          </select>
+        </div>
+
+        <div id="jobcardField" class="hidden-field">
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Jobcard No. *</label>
+          <input type="text" name="jobcard" id="jobcardInput" placeholder="e.g. JC-2405" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+        </div>
+
+        <div>
+          <label class="text-[10px] font-bold text-[var(--muted)] uppercase tracking-wider">Remarks</label>
+          <input name="remark" placeholder="e.g. Supplier delivery / Issued for job" autocomplete="off" class="w-full mt-1.5 px-3.5 py-2.5 rounded-xl bg-white border border-[var(--border)]">
+        </div>
+        <div class="flex gap-2 pt-3">
+          <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl bg-white border border-[var(--border)] text-sm font-bold">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-[var(--primary)] text-white text-sm font-bold shadow-md shadow-[var(--primary)]/20">Save Entry</button>
+        </div>
+      </form>
+    </div>`;
+  renderTxnItemOptions('');
+  showModal();
+}
+
+function renderTxnItemOptions(query) {
+  const q = query.toLowerCase().trim();
+  let items = DB.items;
+  if (q) {
+    items = items.filter(it =>
+      it.name.toLowerCase().includes(q) ||
+      it.code.toLowerCase().includes(q) ||
+      it.category.toLowerCase().includes(q)
+    );
+  }
+  const container = document.getElementById('txnItemResults');
+  if (!container) return;
+
+  if (items.length === 0) {
+    container.innerHTML = '<p class="p-4 text-center text-xs text-[var(--muted)]">No items found</p>';
+    return;
+  }
+  const show = items.slice(0, 30);
+  container.innerHTML = show.map(it => {
+    const stock = currentStock(it.id);
+    const isSelected = txnItemSelected === it.id;
+    return `
+      <div onclick="selectTxnItem('${it.id}')" class="item-option px-3 py-2.5 cursor-pointer flex items-center justify-between gap-2 ${isSelected ? 'bg-[var(--bg-soft)]' : 'bg-white'}">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold truncate ${isSelected ? 'text-[var(--primary)]' : ''}">${it.name}</p>
+          <p class="text-[10px] text-[var(--muted)]">${it.code} · ${it.category}</p>
+        </div>
+        <div class="text-right flex-shrink-0">
+          <p class="text-xs font-bold ${stock <= 0 ? 'text-red-500' : stock <= it.minStock ? 'text-amber-600' : 'text-[var(--primary)]'}">${stock}</p>
+          <p class="text-[9px] text-[var(--muted)]">${it.unit}</p>
+        </div>
+        ${isSelected ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D5016" stroke-width="3" class="flex-shrink-0"><polyline points="20 6 9 17 4 12"/></svg>' : ''}
+      </div>`;
+  }).join('');
+}
+
+function filterTxnItems() {
+  const input = document.getElementById('txnItemSearch');
+  if (!input) return;
+  if (txnItemSelected) {
+    txnItemSelected = null;
+    document.getElementById('txnItemId').value = '';
+  }
+  renderTxnItemOptions(input.value);
+}
+
+function selectTxnItem(id) {
+  txnItemSelected = id;
+  document.getElementById('txnItemId').value = id;
+  const item = DB.items.find(i => i.id === id);
+  if (item) {
+    document.getElementById('txnItemSearch').value = item.name;
+  }
+  renderTxnItemOptions(document.getElementById('txnItemSearch').value);
+}
+
+function selectType(type) {
+  document.getElementById('typeField').value = type;
+  const inB = document.getElementById('typeIN');
+  const outB = document.getElementById('typeOUT');
+  const companyField = document.getElementById('companyField');
+  const jobcardField = document.getElementById('jobcardField');
+
+  if (type === 'IN') {
+    inB.className = 'py-3.5 rounded-xl bg-green-100 border-2 border-[var(--primary)] text-[var(--primary)] font-bold text-sm flex items-center justify-center gap-2';
+    outB.className = 'py-3.5 rounded-xl bg-white border-2 border-[var(--border)] text-[var(--muted)] font-bold text-sm flex items-center justify-center gap-2';
+    companyField.classList.remove('hidden-field');
+    jobcardField.classList.add('hidden-field');
+    document.getElementById('jobcardInput').required = false;
+  } else {
+    inB.className = 'py-3.5 rounded-xl bg-white border-2 border-[var(--border)] text-[var(--muted)] font-bold text-sm flex items-center justify-center gap-2';
+    outB.className = 'py-3.5 rounded-xl bg-red-100 border-2 border-[var(--danger)] text-[var(--danger)] font-bold text-sm flex items-center justify-center gap-2';
+    companyField.classList.add('hidden-field');
+    jobcardField.classList.remove('hidden-field');
+    document.getElementById('jobcardInput').required = true;
+  }
+}
+
+function saveTxn(e) {
+  e.preventDefault();
+  const f = e.target;
+  const type = f.type.value;
+  const itemId = f.itemId.value;
+  const qty = parseInt(f.qty.value);
+  const date = f.date.value || todayStr();
+  const remark = f.remark.value.trim();
+  const company = type === 'IN' ? (f.company.value || '') : '';
+  const jobcard = type === 'OUT' ? (f.jobcard.value.trim() || '') : '';
+
+  if (!itemId) { toast('Select an item', 'error'); return; }
+  if (!qty || qty < 1) { toast('Enter valid quantity', 'error'); return; }
+  if (type === 'OUT' && !jobcard) { toast('Enter jobcard no.', 'error'); return; }
+
+  if (type === 'OUT') {
+    const cs = currentStock(itemId);
+    if (qty > cs) { toast('Only ' + cs + ' in stock', 'error'); return; }
+  }
+
+  DB.transactions.push({ id: uid(), date, itemId, type, qty, company, jobcard, remark });
+  saveDB();
+  closeModal();
+  toast(type === 'IN' ? 'Stock added' : 'Stock issued');
+  renderTab();
+}
+
+/* ===== EMPTY STATE ===== */
+function emptyState(title, sub, gotoTab) {
+  return `
+    <div class="text-center py-16 px-4">
+      <div class="w-16 h-16 rounded-2xl bg-white border border-[var(--border)] mx-auto mb-4 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B7568" stroke-width="1.8"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      </div>
+      <p class="font-bold text-sm">${title}</p>
+      <p class="text-xs text-[var(--muted)] mt-1 mb-4">${sub}</p>
+      ${gotoTab ? `<button onclick="switchTab('${gotoTab}')" class="px-4 py-2 rounded-xl bg-[var(--primary)] text-white text-xs font-bold">Go to ${gotoTab === 'masters' ? 'Items' : 'In/Out'}</button>` : ''}
+    </div>`;
+}
+
+/* ===== MODAL CONTROL ===== */
+function showModal() {
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+function closeModalBg(e) {
+  if (e.target.id === 'modalOverlay') closeModal();
+}
+
+/* ===== EXCEL EXPORT ===== */
+function exportToExcel() {
+  if (DB.items.length === 0) { toast('No data to export', 'error'); return; }
+
+  const summary = DB.items.map(it => {
+    const s = currentStock(it.id);
+    let inT = 0, outT = 0;
+    DB.transactions.forEach(t => { if (t.itemId === it.id) { if (t.type === 'IN') inT += t.qty; else outT += t.qty; } });
+    return {
+      'Code': it.code,
+      'Item Name': it.name,
+      'Category': it.category,
+      'Unit': it.unit,
+      'Total In': inT,
+      'Total Out': outT,
+      'Current Stock': s,
+      'Min Required': it.minStock,
+      'Status': s <= 0 ? 'Out of Stock' : s <= it.minStock ? 'Low Stock' : 'In Stock'
+    };
+  });
+
+  const txns = [...DB.transactions]
+    .sort((a, b) => (a.date + a.id).localeCompare(b.date + b.id))
+    .map(t => {
+      const it = DB.items.find(i => i.id === t.itemId);
+      return {
+        'Date': t.date,
+        'Type': t.type === 'IN' ? 'Stock In' : 'Stock Out',
+        'Jobcard No': t.jobcard || '',
+        'Company': t.company || '',
+        'Code': it ? it.code : '',
+        'Item Name': it ? it.name : 'Unknown',
+        'Quantity': t.qty,
+        'Unit': it ? it.unit : '',
+        'Remarks': t.remark || ''
+      };
+    });
+
+  const masters = DB.items.map(it => ({
+    'Code': it.code,
+    'Item Name': it.name,
+    'Category': it.category,
+    'Unit': it.unit,
+    'Min Stock': it.minStock
+  }));
+
+  const wb = XLSX.utils.book_new();
+
+  const ws1 = XLSX.utils.json_to_sheet(summary);
+  ws1['!cols'] = [{ wch: 12 }, { wch: 35 }, { wch: 18 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 13 }, { wch: 12 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws1, 'Stock Summary');
+
+  const ws2 = XLSX.utils.json_to_sheet(txns);
+  ws2['!cols'] = [{ wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 35 }, { wch: 10 }, { wch: 10 }, { wch: 25 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'In Out Entries');
+
+  const ws3 = XLSX.utils.json_to_sheet(masters);
+  ws3['!cols'] = [{ wch: 12 }, { wch: 35 }, { wch: 18 }, { wch: 10 }, { wch: 12 }];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Item Masters');
+
+  const fname = 'CarzSpa_Stock_' + todayStr() + '.xlsx';
+  XLSX.writeFile(wb, fname);
+  toast('Excel exported');
+}
+
+/* ===== INIT ===== */
+loadDB();
+switchTab('summary');
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.getElementById('modalOverlay').addEventListener('touchmove', function(e) {
+  if (e.target.id === 'modalOverlay') e.preventDefault();
+}, { passive: false });
+</script>
+</body>
+</html>
